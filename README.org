@@ -1,0 +1,50 @@
+* Introduction
+
+  This repository is a simple way to extract the standard output and input of
+  an ipython notebook into an easy-to-submit Word Docx. Designed for programming
+  courses that require you to submit a copy of your ipython notebook output.
+  
+* Requirements
+
+  The few requirements for this project are:
+
+  - [[https://www.perl.org/][Perl]] >= 5.18.* < 6.*.*
+  - [[http://www.sbcl.org/][SBCL]] >= 2.*.*
+  - [[https://www.quicklisp.org/beta/][Quicklisp]] Any Version
+  - [[https://pandoc.org/][Pandoc]] >= 2.13.*
+
+  While these may not be on your systems, they are on all of the ones I use
+  regularly (MacOS and various Linux flavours).
+
+* How It Works/How To Use It
+
+  The mechanism by which the code works is simple. Under the hood, an ipython
+  notebook is a massive JSON object. We parse this JSON, and then print it into
+  an easy to convert format.
+
+** Usage
+
+   Save the ipython file (with the output in it) and download it. Then run
+
+   #+BEGIN_SRC sh
+     ./get-output.pl </path/to/filename>.ipynb
+   #+END_SRC
+
+   This command will leave a file named =<filename>.docx= in the directory you
+   ran it from.
+
+   **TIP**: If there's a cell that produces output on stdout or stdin that
+   you want not to show up, put the line =%%capture --no-stderr cap= at the
+   beginning of the cell. It's a type of [[https://ipython.readthedocs.io/en/stable/interactive/magics.html#cellmagic-capture][magic]] that has no other side effects,
+   but hides output. Otherwise, every cell with printed output will be counted
+   as an individual problem.
+
+** Mechanism
+
+   The process used is relatively simple:
+
+   1. Perl starts an interpreter, parses arguments, and gets everything set up.
+   2. Perl starts a background lisp interpreter (SBCL in this case) which parses
+      the ipython notebook into a format called =org=.
+   3. Perl calls pandoc to convert the org file into a Word document.
+   4. Perl deletes the org file, so you never see it.      
